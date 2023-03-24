@@ -24,5 +24,37 @@
 clone 到自己的本地分支，做一些 bug fix，然后发起 pull request给原仓库，让原仓库的管理者看到你提交的修改。  
 原仓库的管理者 review 这个 bug，如果是正确的话，就会 merge 到他自己的项目中。merge 的意思就是合并，将你修改的这部分代码合并到原来的仓库中添加代码或者替换掉原来的代码。至此，整个 Pull Request 的过程就结束了。
 
-###torotiseGit  
+##torotiseGit的下载安装和使用
+官网下载TGit就行，还有中文包，安装一路next
+###使用！重点
+现在可能会，一段时间不用又不会了！！这个软件是结合Git一起使用的，就是Git的一种图形化软件，后面会仔细说说这个软件结合Git的用法！！
+
+管理Git的仓库很好的工具
+
+###第一步使用这个方法在本地克隆一个Git仓库 
+ 
+	格式：git clone https://github.com/RT-Thread/rt-thread/
+后面有SSH密钥了，不这样下载克隆Git仓库了！！  
+上面的克隆就是下载，这一步，就是使我们的磁盘上有一个仓库  
+
+###第二步就是上传Code到我们的GitHub仓库里面  
+这里使用SSH密钥，方法：  
+使用tortoisegit软件实现产生密钥，在GitHub网站上添加。具体如下：
+使用tortoisegit软件产生的子软件PuTTYgen软件生成密钥。将密钥复制到GitHub网站SSH中。
+还要保存Save private key,这个文件非常重要。使用Git时需要添加，同一个密钥，在不同电脑上是可以运行的，只要是同一个账号，自己添加Git远端的相关设置就行。  
+![](\Picture\tu1.png)
+注：上面这个图片必须这样设置！！我在选择实际生效选项时，并不能将本地Code发送到GitHub仓库！！
+
+###第三步如何发送，怎样设置Git和tortoiseGit
+![](\Picture\tu2.png)
+注意：必须在本地仓库代码中右键，点击TGit-->设置，Git下面的远端才会出现！！  
+
+PuTTY密钥！！生成的那个文件！！！
+
+###从本地上传代码到Git步骤
+####修改的Code先到TGit-->添加；然后Git提交（写好修改日志后才能提交）；最后TGit推送！！！
+
+
+
+
 
