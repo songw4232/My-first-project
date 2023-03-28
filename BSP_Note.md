@@ -10,7 +10,6 @@ ENV工具，包，可以在RT-Thread官网找到相关的软件包，对于ENV�
 ![](/figture/tu4.jpg)
 上面两个图，可以看到在官网找到需要的软件包的时候，RT-Thread online packages里面，可以看到分类，这个里面的内容是ENV软件自带的！！
 
-
 1、构建工程，自动将源码添加到工程  
 2、解决依赖，自动添加头文件到工程，这两个是通过scons脚本来实现  
 3、系统裁减，自动生成宏定义到工程，这是通过Kconfig来完成。  
@@ -210,7 +209,7 @@ board文件夹板级支持外设的kconfig文件：供图形化选择的
 	        select RT_USING_TIMER_SOFT
 	        select PKG_USING_MULTIBUTTON
 	        default n	
-
+	
 	menu "On-chip Peripheral Drivers"#大条件，里面主要是片上外设，比如IIC、SPI、PWN、TIMER等，最开始最基础的！！
 	
 	    config BSP_USING_GPIO
@@ -223,7 +222,7 @@ board文件夹板级支持外设的kconfig文件：供图形化选择的
 	        default y
 	        select RT_USING_SERIAL
 	        if BSP_USING_UART
-
+	
 	menu "Board extended module Drivers"#大条件，外部扩展
 	
 	    menuconfig BSP_USING_AT_ESP8266
@@ -247,7 +246,7 @@ __SConstruct与SConscript是SCons的脚本文件，它们共同配合，一起�
 在SConscript文件中，添加如下代码！！注意：文件夹名称和驱动文件名称必须要在SConscript文件中添加正确！！不然搜索不到路径，不报错，但加不到工程中！！
 
 	if GetDepend(['BSP_USING_KEY']):
-    	src += Glob('ports/drv_key.c')
+		src += Glob('ports/drv_key.c')
 
 
 ##KEY按键软件包的使用（这些有文档更详细）
@@ -274,7 +273,7 @@ flexible_button.c和.h文件加一个demo.c文件，一个是按键驱动，一�
 	        bool "Enable flexible button demo"
 	        default n
 在这里，大家可以看到有两个⽐较重要的宏
-  
+
 	PKG_USING_FLEXIBLE_BUTTON ： 使能该软件包    
 	PKG_USING_FLEXIBLE_BUTTON_DEMO ：使能该软件包的示例代码  
 #####第二步：
@@ -291,7 +290,7 @@ flexible_button.c和.h文件加一个demo.c文件，一个是按键驱动，一�
 		        default n
 	#define BSP_USING_KEY，因为很多代码都是这样写的#ifdef  BSP_USING_KEY ...endif;只有你定义了这个才能进入条件使用
 	PKG_USING_MULTIBUTTON，正点原子使用的是另一个BUTTON包！！不一样，自己会看需要那个定义函数变量。
-	
+
 在Kconfig文件中仿真写
 	menu "Onboard Peripheral Drivers"
 
@@ -356,19 +355,19 @@ board文件夹下SConscript文件，它是Scons脚本文件，就是通过编辑
 在rt-thread-v4.1.0\bsp\stm32\stm32l475-rtt-pandora\board\CubeMX_Config\Src\stm32l4xx_hal_msp.c中！！生成相关文件，是一些初始化文件！！使用Cube MX软件本来就是初始化的！！！
 
 	/* Peripheral clock enable */
-    __HAL_RCC_USART2_CLK_ENABLE();
-
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    /**USART2 GPIO Configuration
-    PA2     ------> USART2_TX
-    PA3     ------> USART2_RX
-    */
-    GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	__HAL_RCC_USART2_CLK_ENABLE();
+	
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	/**USART2 GPIO Configuration
+	PA2     ------> USART2_TX
+	PA3     ------> USART2_RX
+	*/
+	GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
+	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+	GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 ###第三步：
 这样子，我们就可以使⽤USART2了。我们还是准备⼀个驱动代码吧。
@@ -391,6 +390,11 @@ board文件夹下SConscript文件，它是Scons脚本文件，就是通过编辑
 	    src += Glob('ports/drv_usart2_test.c')  
 
 这样我们的USART2外设就可以⽤了。  
+
+注：只是再重新scons一下并不能添加到工程中，必须再进入menuconfig设置一下！！也可能我的编译方式不对！！
+
+
+
 后⾯基本所有的外设都是这么配置，千万不要忘记配置MspInit这个函数哟！！！！！
 
 
@@ -430,7 +434,7 @@ Kconfig配置
 	                select BSP_SPI3_TX_USING_DMA
 	                default n
 	        endif
-
+	
 	menuconfig BSP_USING_PWM#（pwm4 ch2）自己查原理图，需要哪个PWM，哪个通道
 	        bool "Enable PWM"
 	        default n
@@ -449,7 +453,7 @@ Kconfig配置
 	                    default n	            
 	            endif
 	        endif
-
+	
 	menuconfig BSP_USING_TIM#PWM会涉及到定时器！！
 	        bool "Enable timer"
 	        default n
@@ -464,6 +468,8 @@ Kconfig配置
 
 就是使用Cube MX来生成相关初始化 
 spi,定时器设置PWM通道等，
+
+注：自己实操的时候，定时器PWM的时钟没有开启，导致屏幕不亮，查错查了半天，这个Cube MX的配置一步都不能错！！细心！！
 
 上面的还有没配置完成，在Kconfig里面添加LCD相关的配置，刚刚只是片上外设的配置，LCD所需要的一些外设配置，LCD自己的还没有配置
 在板载外设里面添加SPI和PWM等！！
