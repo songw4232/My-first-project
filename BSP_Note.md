@@ -508,3 +508,114 @@ spi,定时器设置PWM通道等，
 在总的SConstruct总的文件夹里添加
 	objs.extend(SConscript(os.path.join(os.getcwd(), 'board', 'ports', 'SConscript')))
 	 'board', 'ports', 文件夹自己新添加的!!
+
+
+##STM32U575系列移植
+####遇到的问题Cube MX重新生成core文件夹，替换掉。会出现Error_Handler()函数在*_msp.c文件下报错的问题
+	.\build\keil\Obj\rtthread.axf: Error: L6218E: Undefined symbol Error_Handler (referred from stm32u5xx_hal_msp.o).
+	解决办法：（在官方仓库中看见的！！这仓库的东西够我学一年）
+	[stm32] 解决Error_Handler()函数在*_msp.c文件下报错的问题
+	在用户头文件区增加#include <drv_common.h>即可
+
+####添加PWM外设遇到的问题
+在BSP移植STM32U5系列的，因为这个板子可能不常见，官方的库不全面，没有包含SOC_SERIES_STM32F4像这个一样的宏定义，单片机时会出现各种各样的错误！！！这里肯定需要的是SOC_SERIES_STM32U5！！上面没有，不知道进入哪个条件，也可能进错条件了！！
+
+	#if defined(SOC_SERIES_STM32F2) || defined(SOC_SERIES_STM32F4) || defined(SOC_SERIES_STM32F7)
+	    if (htim->Instance == TIM9 || htim->Instance == TIM10 || htim->Instance == TIM11)
+	#elif defined(SOC_SERIES_STM32L4) || defined(SOC_SERIES_STM32H7)|| defined(SOC_SERIES_STM32F3)
+	    if (htim->Instance == TIM15 || htim->Instance == TIM16 || htim->Instance == TIM17)
+	#elif defined(SOC_SERIES_STM32MP1)
+	    if (htim->Instance == TIM4)
+	#elif defined(SOC_SERIES_STM32F1) || defined(SOC_SERIES_STM32F0) || defined(SOC_SERIES_STM32G0)
+	    if (0)
+	#endif
+	    {
+	#if !defined(SOC_SERIES_STM32F0) && !defined(SOC_SERIES_STM32G0)
+	        tim_clock = (rt_uint32_t)(HAL_RCC_GetPCLK2Freq() * pclk2_doubler);
+	#endif
+	    }
+	    else
+	    {
+	        tim_clock = (rt_uint32_t)(HAL_RCC_GetPCLK1Freq() * pclk1_doubler);
+	    }
+解决方法：
+
+	#if defined(SOC_SERIES_STM32F2) || defined(SOC_SERIES_STM32F4) || defined(SOC_SERIES_STM32F7)
+	    if (htim->Instance == TIM9 || htim->Instance == TIM10 || htim->Instance == TIM11)
+	#elif defined(SOC_SERIES_STM32L4) || defined(SOC_SERIES_STM32H7)|| defined(SOC_SERIES_STM32F3) ||defined(SOC_SERIES_STM32U5)
+	    if (htim->Instance == TIM15 || htim->Instance == TIM16 || htim->Instance == TIM17)
+	#elif defined(SOC_SERIES_STM32MP1)
+	    if (htim->Instance == TIM4)
+	#elif defined(SOC_SERIES_STM32F1) || defined(SOC_SERIES_STM32F0) || defined(SOC_SERIES_STM32G0)
+	    if (0)
+
+####STM32U575系列移植ADC
+
+       .Instance                   = ADC1,                          \
+     /*  .Init.ClockPrescaler        = ADC_CLOCK_SYNC_PCLK_DIV4,    */ \
+       .Init.Resolution            = ADC_RESOLUTION_12B,            \
+
+\这个是啥，一行还没结束！！然后今天被坑了！！keil中出现绿色的，我以为是屏蔽了！！结果是语法错误！！这个确实想当然了！！
+
+	#if defined(SOC_SERIES_STM32L4) || defined(SOC_SERIES_STM32G0) || defined (SOC_SERIES_STM32MP1) || defined(SOC_SERIES_STM32H7) || defined (SOC_SERIES_STM32WB) || defined(SOC_SERIES_STM32U5)
+	        ADC_Enable(stm32_adc_handler);
+	#else
+	        __HAL_ADC_ENABLE(stm32_adc_handler);
+	#endif
+	    }
+	    else
+	    {
+	#if defined(SOC_SERIES_STM32L4) || defined(SOC_SERIES_STM32G0) || defined (SOC_SERIES_STM32MP1) || defined(SOC_SERIES_STM32H7) || defined (SOC_SERIES_STM32WB)|| defined(SOC_SERIES_STM32U5)
+	        ADC_Disable(stm32_adc_handler);
+	#else
+	        __HAL_ADC_DISABLE(stm32_adc_handler);
+	#endif
+
+不是有点明显啊！！ 第一步：一开始是都有这个defined(SOC_SERIES_STM32U5)，然后我就想着应该是少了这个吧！！第二步：然后这个代码他报错！__HAL_ADC_ENABLE(stm32_adc_handler);，那我就想着用上面一个呗！！然后就好了！应该对吧！！
+
+
+####STM32U575系列移植SPI，测试使用007
+bug是别人帮忙改的，学着加强改bug能力！！
+
+	#if defined(SOC_SERIES_STM32F2) || defined(SOC_SERIES_STM32F4) || defined(SOC_SERIES_STM32F7)
+	            spi_bus_obj[i].dma.handle_rx.Init.Channel = spi_config[i].dma_rx->channel;
+	#elif defined(SOC_SERIES_STM32L4) || defined(SOC_SERIES_STM32G0) || defined(SOC_SERIES_STM32MP1) || defined(SOC_SERIES_STM32WB) || defined(SOC_SERIES_STM32H7)
+	            spi_bus_obj[i].dma.handle_rx.Init.Request = spi_config[i].dma_rx->request;
+	#endif
+						#if 0
+	            spi_bus_obj[i].dma.handle_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+	            spi_bus_obj[i].dma.handle_rx.Init.PeriphInc           = DMA_PINC_DISABLE;//这一部分代码报错，原因没有定义
+	            spi_bus_obj[i].dma.handle_rx.Init.MemInc              = DMA_MINC_ENABLE;
+	            spi_bus_obj[i].dma.handle_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+	            spi_bus_obj[i].dma.handle_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+	            spi_bus_obj[i].dma.handle_rx.Init.Mode                = DMA_NORMAL;
+	            spi_bus_obj[i].dma.handle_rx.Init.Priority            = DMA_PRIORITY_HIGH
+						#endif
+
+别人帮我改好了，才发觉。现在看来，好像一开始的思路有点问题！！代码报错的部分，原因没有定义！我的思路是应该和上面修改PWM和ADC一样，在适当的地方加一个defined(SOC_SERIES_STM32U5)，但是你仔细看这里的报错和defined(SOC_SERIES_STM32U5)if的宏定义没有关系的，#endif已经结束了！！
+那现在最简单的改法，这是DMA现在用不到，那就屏蔽掉！！
+
+	ArmClang: error: no such file or directory: '../libraries/STM32U5xx_HAL/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_qspi.c'
+没有添加这个qspi，但是现在不需要这个，就去屏蔽掉，去哪找，去哪屏蔽！！关键点
+用VScode查找stm32u5xx_hal_qspi这个在哪！然后你要确定是哪个文件的包含stm32u5xx_hal_qspi才把这个加入到工程里面的，但是这里面并没有这个文件而报错！
+![](/figture/tu9.jpg)
+这个文件在Sconcript脚本文件！！
+
+	warning: redefinition of typedef 'socklen_t' is a C11 feature [-Wtypedef-redefinition]
+	警告：typedef 'socklen_t' 的重定义是 C11 功能[-Wtypedef-redefinition]
+
+####查找快捷键ctrl+f
+####多任务切换 win+tab
+
+####5.0版本RW007软件包移植
+
+遇到了之前的一个问题！！
+
+	.\build\keil\Obj\rtthread.axf: Error: L6218E: Undefined symbol Error_Handler (referred from stm32u5xx_hal_msp.o).
+	[stm32] 解决Error_Handler()函数在*_msp.c文件下报错的问题
+	在用户头文件区增加#include <drv_common.h>即可
+	Error_Handler在drv_common.h文件里，所以加这个头文件！！
+	
+	我的也是Undefined symbol rt_hw_spi_device_attach，我就找在那个文件里面，#include <drv_spi.h>这里，但是已经加过了！！又
+	是啥原因呢！！然后我发现drv_spi.c里面的rt_hw_spi_device_attach是灰色的！就是没使用的意思！！我才意识到是宏定义没定义，没使
+	用这个rt_hw_spi_device_attach，然后意识到没初始化这个SPI1，menuconfig里面没有配置！！
