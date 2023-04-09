@@ -1,7 +1,7 @@
 #Github
 
 [向 RT-Thread 贡献代码](https://www.rt-thread.org/document/site/#/rt-thread-version/rt-thread-standard/development-guide/github/github)  
-还写啥笔记啊！！这个RT-Thread官方的文档要多详细就有多详细！！直接去官网文档看去
+还写啥笔记啊！！这个RT-Thread官方的文档要多详细就有多详细！！直接去官网文档看去，这里面有fork、怎么克隆、创建本地分支、提交等等，需要向RT-Thread的贡献的，也就是可以PR的，一系列步骤都详细记载！！
 ###GitHub 的 Pull Request 是指什么意思？[知识点链接](https://www.zhihu.com/question/21682976/answer/79489643)
 
 
@@ -66,3 +66,23 @@ __注意:__Tortoisegit是Git的一个插件（客户端），Git程序本身还�
 将git上源文件克隆到本地，在本地创建好要存放资源的文件夹，之后在此文件内右键单击，可以看到下拉菜单中增加了TortoiseGit的三个选项，选择Git Clone。  
 输入Url，自动创建本地目录，也可以手动选择  
 注：递归需要勾上，确定以后就会Clone本地仓库了
+
+####注：SSH密钥文件，所在文件夹名称和位置修改移动过，需要再TGit设置里面的Git重新加载SSH！！否则不能成功上传到GitHub中！！！
+
+
+##Github 使用经典问题：如何同步 fork 项目原仓库的更新
+
+1. 进入你自己的 fork 过来的仓库。
+2. 点击 "Pull requests" ，如何点击右侧绿色的 "New pull request"。
+3. Github 首先会比较源仓库与你 fork 后的仓库，如果你没有做任何更改，则找不到要 PR 的内容。所以，我们需要点击 "switching the base"，会将我们的仓库作为基础版本，原仓库作为 head 版本，现在我们会看到我们的需要 "catch up" 的更新。
+4. 点击 "Create pull request"，起一个名字，然后点击 "Create pull request"。
+5. 点击 "Merge pull request"，然后点击 "Confirm merge"。
+6. 如果我们没提交什么新代码，merge 过程将自动完成。
+
+		Pull requests：拉请求
+		switching the base：切换底座
+		catch up：追上
+		Create pull request：创建拉取请求
+		Merge pull request：合并拉取请求
+		Confirm merge：确认合并
+

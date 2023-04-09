@@ -619,3 +619,90 @@ bug是别人帮忙改的，学着加强改bug能力！！
 	我的也是Undefined symbol rt_hw_spi_device_attach，我就找在那个文件里面，#include <drv_spi.h>这里，但是已经加过了！！又
 	是啥原因呢！！然后我发现drv_spi.c里面的rt_hw_spi_device_attach是灰色的！就是没使用的意思！！我才意识到是宏定义没定义，没使
 	用这个rt_hw_spi_device_attach，然后意识到没初始化这个SPI1，menuconfig里面没有配置！！
+
+##STM32U5系列BSP移植总结（重点重点超重点！！！）
+
+具体说一下，我这两周通过BSP添加了STM32U575板子的外设！u575是新板子么，RT-Thread的BSP库里面之前也没人使用过，所以需要人移植，添加一些驱动，供人使用。  
+好！那么没有人用过，添加BSP时，就不可能添加的移植代码百分百的适配这个板子！这一点能理解吧！！所以，遇到什么问题，就要去解决它，使它适配u575的开发板。  
+上面也说了一些添加按键软件包、串口2、ADC1、PWM、IIC、SPI等外设时，所遇到的问题，及其简单的处理bug,但上面的bug虽然在这个问题下解决了，但是却影响了整个RT-Thread代码里面BSP/stm32里面的代码中其他工程！！！如果是这样解决的问题，肯定是不能这样处理的，打个比方来说：
+STM32U575系列移植SPI，测试使用007
+
+	#if defined(SOC_SERIES_STM32F2) || defined(SOC_SERIES_STM32F4) || defined(SOC_SERIES_STM32F7)
+	            spi_bus_obj[i].dma.handle_rx.Init.Channel = spi_config[i].dma_rx->channel;
+	#elif defined(SOC_SERIES_STM32L4) || defined(SOC_SERIES_STM32G0) || defined(SOC_SERIES_STM32MP1) || defined(SOC_SERIES_STM32WB) || defined(SOC_SERIES_STM32H7)
+	            spi_bus_obj[i].dma.handle_rx.Init.Request = spi_config[i].dma_rx->request;
+	#endif
+						#if 0
+	            spi_bus_obj[i].dma.handle_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+	            spi_bus_obj[i].dma.handle_rx.Init.PeriphInc           = DMA_PINC_DISABLE;//这一部分代码报错，原因没有定
+						#endif
+那现在最简单的改法，这是DMA现在用不到，那就屏蔽掉！！那这样处理确实不报错了！但是这个drv_spi.c文件并不是stm32u575的专有文件，这边直接屏蔽了，那么其他文件想要使用就使用不了了！！这一点需要了解！如何解决是重点！！一开始，听别人的，这是一些DMA有关的文件，找一个宏定义一下就行，我找的是有关DMA的，如果打开了，还是不对！！那就是最大的宏，应该使用了U５７５就会报错，那么，就是如果没有定义它，就把它（这部分代码）打开，如果定义了就屏蔽掉，这样处理就不会影响到其他代码了！！是不是很神奇！！以后修改代码就是这个思路！！　　
+
+	#ifndef SOC_SERIES_STM32U5
+	            spi_bus_obj[i].dma.handle_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+	            spi_bus_obj[i].dma.handle_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
+	            spi_bus_obj[i].dma.handle_rx.Init.MemInc              = DMA_MINC_ENABLE;
+	#endif
+
+###所以下面是STM32U5系列BSP移植时，遇到的全部报错情况及大佬的修改
+
+###1.使用ADC时出现的报错情况分析
+最起码的知道是什么错误，而不是一味的去屏蔽这个地方的错误，这样即使把错误解决了，代码也可能功能上出错了！！  
+####错误一：  
+
+	#define ADC1_CONFIG                                                 \
+	    {                                                               \
+	       .Instance                   = ADC1,                          \
+	       .Init.ClockPrescaler        = ADC_CLOCK_SYNC_PCLK_DIV4,      \把这个换成下面的代码，因为u5里面没有这个宏定义
+	       .Init.ClockPrescaler        = ADC_CLOCK_ASYNC_DIV4,          \
+	       .Init.Resolution            = ADC_RESOLUTION_12B,            \
+	       .Init.DataAlign             = ADC_DATAALIGN_RIGHT,           \
+	       .Init.ScanConvMode          = ADC_SCAN_DISABLE, 
+
+（1）ADC1_CONFIG一开始是这个报错，原因是`.Init.ClockPrescaler        = ADC_CLOCK_SYNC_PCLK_DIV4,`这一行的代码没有定义！！一开始的想法是直接把这一行的代码删掉，但是总觉得不妥！！咋可能无缘无故的去删除源库里面的代码，不妥不妥！！  
+（2）但是，这个问题去交给我解决的话，我估计是搞个好几周都不一定解决的了的！所以看大佬改BUG真的可以学到东西的，因为这行代码没有定义，先看这行代码是什么，为什么找不到定义，这是一个ADC四分频的宏定义！难道是说这个stm32u575的ADC不用分频的？这是最开始的猜测。所以，把这行代码删掉就合理！！但是，可能性不大，这个单片机不太可能没有ADC分频的。  
+（3）现在是大佬的表演时间！现在就去VScode里面去找一些`ADC_CLOCK_SYNC_PCLK_DIV4`这个相似的定义，看看这个单片机是不是真的没有ADC分频的相关定义，所以，找`_PCLK_DIV4`一半，找相似的定义，这个凭运气嘛，因为库没人能看完，看完也记不住这些的，就是去搜索，去看看相似的定义，从而找到解决问题的方法！！从上帝视角看，这个搜索，也没有什么发现，大佬有搜索这个`SYNC`，我的话，肯定想不到这个，都不知道这个的含义，就发现了这个宏`ADC_CLOCK_ASYNC_DIV4`，那找到它的时候大佬就已经明白了，对比源代码的宏，多一个A，基本功：异步，异的意思，就能想到这个stm32u575单片机没有同步分频的功能，没有这个宏定义么，所以只有异步的功能，把它修改成这个宏就行！！  
+（4）我一开始还担心，如果把这个代码修改了，会不会和上面的问题一样，会影响到其他文件啊，大佬看了一下文件所在的具体位置，是u5专用的！！不会影响的。问题解决  
+
+####错误二：
+ 	vref_mv = __LL_ADC_CALC_VREFANALOG_VOLTAGE(vref_value, stm32_adc_handler->Init.Resolution);
+报错！！一开始我的解决问题是屏蔽了就好了！！不能这么修改代码，简单的屏蔽了，ADC的功能就可能实现不了了，怪不得我的验证ADC测量电压一直为零！！不就能说明问题。  
+我想，我稍微的去看一下这个代码的函数定义就能发现它错在哪了！！能本就不用去看报错原因！！可是我没有看！可能是个态度问题吧，这个需要改！！是函数参数不对！！
+（1）大佬的解决问题，这个我肯定一下子学不来！看函数定义缺少哪个或者那几个参数，添加进来就行，我现在的功力达不到
+
+	#ifdef SOC_SERIES_STM32U5
+	    vref_mv = __LL_ADC_CALC_VREFANALOG_VOLTAGE(stm32_adc_handler->Instance, vref_value, stm32_adc_handler->Init.Resolution);
+	#else
+	    vref_mv = __LL_ADC_CALC_VREFANALOG_VOLTAGE(vref_value, stm32_adc_handler->Init.Resolution);
+	#endif
+
+这里就有一个非常大非常大的坑！！我感觉一般人搞不定的，源代码现在没打开，条件不允许啊！不知道为啥，这个文件并不是像上面的文件一样，只是u5专用，这个文件时drv_adc.c文件，是所有stm32芯片公用的！这里如果直接把`vref_mv = __LL_ADC_CALC_VREFANALOG_VOLTAGE(vref_value, stm32_adc_handler->Init.Resolution);`修改成`vref_mv = __LL_ADC_CALC_VREFANALOG_VOLTAGE(stm32_adc_handler->Instance, vref_value, stm32_adc_handler->Init.Resolution);`会不会影响其他文件，难道还是说这个代码是源代码里面的BUG，代码更新，u5里面的代码没有及时更新，导致参数输入错误，很有可能！！  
+（2）资深大佬可不是仅靠猜测来修改代码的，他去看看别的stm32其他系列单片机里面的这个函数是否也是两个参数，查了一下，是，那就把U5单独提出来做修改，修改如上，经典思路，谨记谨记  
+（3）我觉得其他stm32文件的`__LL_ADC_CALC_VREFANALOG_VOLTAGE(stm32_adc_handler->Instance, vref_value, stm32_adc_handler->Init.Resolution);`这个函数，会不会也是没更新，使用时也会报错，这个因为没使用，现在条件不允许，会验证！！这个以后再说  
+
+###2使用SPI1驱动flash中遇到的错误
+
+####错误一：
+	#ifndef SOC_SERIES_STM32U5
+	            spi_bus_obj[i].dma.handle_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+	            spi_bus_obj[i].dma.handle_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
+	            spi_bus_obj[i].dma.handle_tx.Init.MemInc              = DMA_MINC_ENABLE;
+	            spi_bus_obj[i].dma.handle_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+	            spi_bus_obj[i].dma.handle_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+	            spi_bus_obj[i].dma.handle_tx.Init.Mode                = DMA_NORMAL;
+	            spi_bus_obj[i].dma.handle_tx.Init.Priority            = DMA_PRIORITY_LOW;
+	#endif
+（1）有两处dma的地方，没有定义报错，我上面的修改，是最简单的一种，但是，我现在忽然想到，这里的该法是因为我并没有使用DMA，这里DMA报错，那我直接屏蔽掉就行，如果使用u5就把它屏蔽，如果没有定义u5就可以使用，可取。
+（2）但是现在，那如果我要在U5里面使用DMA呢，把屏蔽了，算咋回事，这出的修改BUG有待改良！！
+有时间可以自己去解决！！和`.Init.ClockPrescaler        = ADC_CLOCK_ASYNC_DIV4`解决方法一样！！
+
+###错误二：
+	src += ['STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_qspi.c']没有找到这个qspi文件！
+（1）这个BUG另一个大佬帮解决的！！它是如何找到，并屏蔽它的，前面说的有，也是使用VScode在整个文件里面去找的，然后靠自己的积累，能力的体现的，去找到报错产生的可能的位置，并把它屏蔽！！必须有点技术啊，这个文件是scons编译加载进来的，然后没有这个文件报错，这也是u5的专属文件，可以修改！！  
+（2）上面的是初级版的BUG修改，还可以优化！看大佬的修改，他发现确实没有这个文件，但是有ospi.c文件，就猜测写源代码的人，出现写了这个BUG，就把修改了：
+
+    src += ['STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_qspi.c']
+    src += ['STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_ospi.c']
+
+###3其他添加外设并无报错问题！！
+
