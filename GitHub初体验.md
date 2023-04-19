@@ -1,7 +1,7 @@
 #Github
 
-[向 RT-Thread 贡献代码](https://www.rt-thread.org/document/site/#/rt-thread-version/rt-thread-standard/development-guide/github/github)  
-还写啥笔记啊！！这个RT-Thread官方的文档要多详细就有多详细！！直接去官网文档看去，这里面有fork、怎么克隆、创建本地分支、提交等等，需要向RT-Thread的贡献的，也就是可以PR的，一系列步骤都详细记载！！
+
+
 ###GitHub 的 Pull Request 是指什么意思？[知识点链接](https://www.zhihu.com/question/21682976/answer/79489643)
 
 
@@ -16,73 +16,11 @@
 
 
 ###fork
-简单的说明：GitHub中Fork 是 服务端的代码仓库克隆（即 新克隆出来的代码仓库在远程服务端），可以包含了原来的仓库（即upstream repository，上游仓库）所有内容，如分支、Tag、提交。代码托管服务（如Github、BitBucket）都提供了方便完成Fork操作的功能（在仓库页面点一下Fork按钮）。这样有了一个你自己的 可以自由提交的远程仓库，然后可以通过的 Pull Request 把你的提交贡献回 原仓库。而对于原仓库Owner来说，鼓励别人Fork他的仓库，通过Pull Request 能给他的仓库做贡献，也是提升了原仓库的知名度。  
-
-当你想更正别人仓库里的错误时，要按照下面的流程进行：   
-
-先 fork 别人的仓库，相当于拷贝一份别人的资料。因为不能保证你的修改一定是正确的，对项目有利的，所以你不能直接在别人的仓库里修改，而是要先fork到自己的git仓库中。  
-clone 到自己的本地分支，做一些 bug fix，然后发起 pull request给原仓库，让原仓库的管理者看到你提交的修改。  
-原仓库的管理者 review 这个 bug，如果是正确的话，就会 merge 到他自己的项目中。merge 的意思就是合并，将你修改的这部分代码合并到原来的仓库中添加代码或者替换掉原来的代码。至此，整个 Pull Request 的过程就结束了。
-
-##torotiseGit的下载安装和使用
-官网下载TGit就行，还有中文包，安装一路next
-###使用！重点
-现在可能会，一段时间不用又不会了！！这个软件是结合Git一起使用的，就是Git的一种图形化软件，后面会仔细说说这个软件结合Git的用法！！
-
-管理Git的仓库很好的工具
-
-###第一步使用这个方法在本地克隆一个Git仓库 
- 
-	格式：git clone https://github.com/RT-Thread/rt-thread/
-后面有SSH密钥了，不这样下载克隆Git仓库了！！  
-上面的克隆就是下载，这一步，就是使我们的磁盘上有一个仓库  
-
-###第二步就是上传Code到我们的GitHub仓库里面  
-这里使用SSH密钥，方法：  
-使用tortoisegit软件实现产生密钥，在GitHub网站上添加。具体如下：
-使用tortoisegit软件产生的子软件PuTTYgen软件生成密钥。将密钥复制到GitHub网站SSH中。
-还要保存Save private key,这个文件非常重要。使用Git时需要添加，同一个密钥，在不同电脑上是可以运行的，只要是同一个账号，自己添加Git远端的相关设置就行。  
-![](\Picture\tu1.png)
-注：上面这个图片必须这样设置！！我在选择实际生效选项时，并不能将本地Code发送到GitHub仓库！！
-
-###第三步如何发送，怎样设置Git和tortoiseGit
-![](\Picture\tu2.png)
-注意：必须在本地仓库代码中右键，点击TGit-->设置，Git下面的远端才会出现！！  
-
-PuTTY密钥！！生成的那个文件！！！
-
-###从本地上传代码到Git步骤
-####修改的Code先到TGit-->添加；然后Git提交（写好修改日志后才能提交）；最后TGit推送！！！
-
-####注意：玄学，我在公司电脑正常推送成功！！今天在自己的电脑设置这个一系列操作，没有自己设置密钥，Git设置自己加的，然后每次都要调整一下！！需要注意，推送不成功时，查找一下TGit中Git的设置是否正确！！！
-
-##进一步理解tortoiseGit和Git的使用
-####安装的方法
-依照上述（Git-->tortoisegit-->TGit中文包）顺序安装，一直下一步就行，具体做法省略。
-
-__注意:__Tortoisegit是Git的一个插件（客户端），Git程序本身还是要安装的。  
-####如何利用TortoiseGit从Github上下载代码
-
-将git上源文件克隆到本地，在本地创建好要存放资源的文件夹，之后在此文件内右键单击，可以看到下拉菜单中增加了TortoiseGit的三个选项，选择Git Clone。  
-输入Url，自动创建本地目录，也可以手动选择  
-注：递归需要勾上，确定以后就会Clone本地仓库了
-
-####注：SSH密钥文件，所在文件夹名称和位置修改移动过，需要再TGit设置里面的Git重新加载SSH！！否则不能成功上传到GitHub中！！！
+简单的说明：GitHub中Fork 是 服务端的代码仓库克隆（即 新克隆出来的代码仓库在远程服务端），可以包含了原来的仓库（即upstream repository，上游仓库）所有内容，如分支、Tag、提交。代码托管服务（如Github、BitBucket）都提供了方便完成Fork操作的功能（在仓库页面点一下Fork按钮）。这样有了一个你自己的 可以自由提交的远程仓库，然后可以通过的 Pull Request 把你的提交贡献回 原仓库。而对于原仓库Owner来说，鼓励别人Fork他的仓库，通过Pull Request 能给他的仓库做贡献，也是提升了原仓库的知名度。
 
 
-##Github 使用经典问题：如何同步 fork 项目原仓库的更新
 
-1. 进入你自己的 fork 过来的仓库。
-2. 点击 "Pull requests" ，如何点击右侧绿色的 "New pull request"。
-3. Github 首先会比较源仓库与你 fork 后的仓库，如果你没有做任何更改，则找不到要 PR 的内容。所以，我们需要点击 "switching the base"，会将我们的仓库作为基础版本，原仓库作为 head 版本，现在我们会看到我们的需要 "catch up" 的更新。
-4. 点击 "Create pull request"，起一个名字，然后点击 "Create pull request"。
-5. 点击 "Merge pull request"，然后点击 "Confirm merge"。
-6. 如果我们没提交什么新代码，merge 过程将自动完成。
 
-		Pull requests：拉请求
-		switching the base：切换底座
-		catch up：追上
-		Create pull request：创建拉取请求
-		Merge pull request：合并拉取请求
-		Confirm merge：确认合并
-
+Hifive  -->   sifive  
+[Kendryte]  -->   [嘉楠Kendryte]  
+[Kendryte]  -->[Canaan Kendryte]  

@@ -10,6 +10,7 @@ ENV工具，包，可以在RT-Thread官网找到相关的软件包，对于ENV�
 ![](/figture/tu4.jpg)
 上面两个图，可以看到在官网找到需要的软件包的时候，RT-Thread online packages里面，可以看到分类，这个里面的内容是ENV软件自带的！！
 
+
 1、构建工程，自动将源码添加到工程  
 2、解决依赖，自动添加头文件到工程，这两个是通过scons脚本来实现  
 3、系统裁减，自动生成宏定义到工程，这是通过Kconfig来完成。  
@@ -209,7 +210,7 @@ board文件夹板级支持外设的kconfig文件：供图形化选择的
 	        select RT_USING_TIMER_SOFT
 	        select PKG_USING_MULTIBUTTON
 	        default n	
-	
+
 	menu "On-chip Peripheral Drivers"#大条件，里面主要是片上外设，比如IIC、SPI、PWN、TIMER等，最开始最基础的！！
 	
 	    config BSP_USING_GPIO
@@ -222,7 +223,7 @@ board文件夹板级支持外设的kconfig文件：供图形化选择的
 	        default y
 	        select RT_USING_SERIAL
 	        if BSP_USING_UART
-	
+
 	menu "Board extended module Drivers"#大条件，外部扩展
 	
 	    menuconfig BSP_USING_AT_ESP8266
@@ -246,7 +247,7 @@ __SConstruct与SConscript是SCons的脚本文件，它们共同配合，一起�
 在SConscript文件中，添加如下代码！！注意：文件夹名称和驱动文件名称必须要在SConscript文件中添加正确！！不然搜索不到路径，不报错，但加不到工程中！！
 
 	if GetDepend(['BSP_USING_KEY']):
-		src += Glob('ports/drv_key.c')
+    	src += Glob('ports/drv_key.c')
 
 
 ##KEY按键软件包的使用（这些有文档更详细）
@@ -273,7 +274,7 @@ flexible_button.c和.h文件加一个demo.c文件，一个是按键驱动，一�
 	        bool "Enable flexible button demo"
 	        default n
 在这里，大家可以看到有两个⽐较重要的宏
-
+  
 	PKG_USING_FLEXIBLE_BUTTON ： 使能该软件包    
 	PKG_USING_FLEXIBLE_BUTTON_DEMO ：使能该软件包的示例代码  
 #####第二步：
@@ -290,7 +291,7 @@ flexible_button.c和.h文件加一个demo.c文件，一个是按键驱动，一�
 		        default n
 	#define BSP_USING_KEY，因为很多代码都是这样写的#ifdef  BSP_USING_KEY ...endif;只有你定义了这个才能进入条件使用
 	PKG_USING_MULTIBUTTON，正点原子使用的是另一个BUTTON包！！不一样，自己会看需要那个定义函数变量。
-
+	
 在Kconfig文件中仿真写
 	menu "Onboard Peripheral Drivers"
 
@@ -355,19 +356,19 @@ board文件夹下SConscript文件，它是Scons脚本文件，就是通过编辑
 在rt-thread-v4.1.0\bsp\stm32\stm32l475-rtt-pandora\board\CubeMX_Config\Src\stm32l4xx_hal_msp.c中！！生成相关文件，是一些初始化文件！！使用Cube MX软件本来就是初始化的！！！
 
 	/* Peripheral clock enable */
-	__HAL_RCC_USART2_CLK_ENABLE();
-	
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-	/**USART2 GPIO Configuration
-	PA2     ------> USART2_TX
-	PA3     ------> USART2_RX
-	*/
-	GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
-	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    __HAL_RCC_USART2_CLK_ENABLE();
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**USART2 GPIO Configuration
+    PA2     ------> USART2_TX
+    PA3     ------> USART2_RX
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 ###第三步：
 这样子，我们就可以使⽤USART2了。我们还是准备⼀个驱动代码吧。
@@ -390,11 +391,6 @@ board文件夹下SConscript文件，它是Scons脚本文件，就是通过编辑
 	    src += Glob('ports/drv_usart2_test.c')  
 
 这样我们的USART2外设就可以⽤了。  
-
-注：只是再重新scons一下并不能添加到工程中，必须再进入menuconfig设置一下！！也可能我的编译方式不对！！
-
-
-
 后⾯基本所有的外设都是这么配置，千万不要忘记配置MspInit这个函数哟！！！！！
 
 
@@ -434,7 +430,7 @@ Kconfig配置
 	                select BSP_SPI3_TX_USING_DMA
 	                default n
 	        endif
-	
+
 	menuconfig BSP_USING_PWM#（pwm4 ch2）自己查原理图，需要哪个PWM，哪个通道
 	        bool "Enable PWM"
 	        default n
@@ -453,7 +449,7 @@ Kconfig配置
 	                    default n	            
 	            endif
 	        endif
-	
+
 	menuconfig BSP_USING_TIM#PWM会涉及到定时器！！
 	        bool "Enable timer"
 	        default n
@@ -468,8 +464,6 @@ Kconfig配置
 
 就是使用Cube MX来生成相关初始化 
 spi,定时器设置PWM通道等，
-
-注：自己实操的时候，定时器PWM的时钟没有开启，导致屏幕不亮，查错查了半天，这个Cube MX的配置一步都不能错！！细心！！
 
 上面的还有没配置完成，在Kconfig里面添加LCD相关的配置，刚刚只是片上外设的配置，LCD所需要的一些外设配置，LCD自己的还没有配置
 在板载外设里面添加SPI和PWM等！！
@@ -508,201 +502,3 @@ spi,定时器设置PWM通道等，
 在总的SConstruct总的文件夹里添加
 	objs.extend(SConscript(os.path.join(os.getcwd(), 'board', 'ports', 'SConscript')))
 	 'board', 'ports', 文件夹自己新添加的!!
-
-
-##STM32U575系列移植
-####遇到的问题Cube MX重新生成core文件夹，替换掉。会出现Error_Handler()函数在*_msp.c文件下报错的问题
-	.\build\keil\Obj\rtthread.axf: Error: L6218E: Undefined symbol Error_Handler (referred from stm32u5xx_hal_msp.o).
-	解决办法：（在官方仓库中看见的！！这仓库的东西够我学一年）
-	[stm32] 解决Error_Handler()函数在*_msp.c文件下报错的问题
-	在用户头文件区增加#include <drv_common.h>即可
-
-####添加PWM外设遇到的问题
-在BSP移植STM32U5系列的，因为这个板子可能不常见，官方的库不全面，没有包含SOC_SERIES_STM32F4像这个一样的宏定义，单片机时会出现各种各样的错误！！！这里肯定需要的是SOC_SERIES_STM32U5！！上面没有，不知道进入哪个条件，也可能进错条件了！！
-
-	#if defined(SOC_SERIES_STM32F2) || defined(SOC_SERIES_STM32F4) || defined(SOC_SERIES_STM32F7)
-	    if (htim->Instance == TIM9 || htim->Instance == TIM10 || htim->Instance == TIM11)
-	#elif defined(SOC_SERIES_STM32L4) || defined(SOC_SERIES_STM32H7)|| defined(SOC_SERIES_STM32F3)
-	    if (htim->Instance == TIM15 || htim->Instance == TIM16 || htim->Instance == TIM17)
-	#elif defined(SOC_SERIES_STM32MP1)
-	    if (htim->Instance == TIM4)
-	#elif defined(SOC_SERIES_STM32F1) || defined(SOC_SERIES_STM32F0) || defined(SOC_SERIES_STM32G0)
-	    if (0)
-	#endif
-	    {
-	#if !defined(SOC_SERIES_STM32F0) && !defined(SOC_SERIES_STM32G0)
-	        tim_clock = (rt_uint32_t)(HAL_RCC_GetPCLK2Freq() * pclk2_doubler);
-	#endif
-	    }
-	    else
-	    {
-	        tim_clock = (rt_uint32_t)(HAL_RCC_GetPCLK1Freq() * pclk1_doubler);
-	    }
-解决方法：
-
-	#if defined(SOC_SERIES_STM32F2) || defined(SOC_SERIES_STM32F4) || defined(SOC_SERIES_STM32F7)
-	    if (htim->Instance == TIM9 || htim->Instance == TIM10 || htim->Instance == TIM11)
-	#elif defined(SOC_SERIES_STM32L4) || defined(SOC_SERIES_STM32H7)|| defined(SOC_SERIES_STM32F3) ||defined(SOC_SERIES_STM32U5)
-	    if (htim->Instance == TIM15 || htim->Instance == TIM16 || htim->Instance == TIM17)
-	#elif defined(SOC_SERIES_STM32MP1)
-	    if (htim->Instance == TIM4)
-	#elif defined(SOC_SERIES_STM32F1) || defined(SOC_SERIES_STM32F0) || defined(SOC_SERIES_STM32G0)
-	    if (0)
-
-####STM32U575系列移植ADC
-
-       .Instance                   = ADC1,                          \
-     /*  .Init.ClockPrescaler        = ADC_CLOCK_SYNC_PCLK_DIV4,    */ \
-       .Init.Resolution            = ADC_RESOLUTION_12B,            \
-
-\这个是啥，一行还没结束！！然后今天被坑了！！keil中出现绿色的，我以为是屏蔽了！！结果是语法错误！！这个确实想当然了！！
-
-	#if defined(SOC_SERIES_STM32L4) || defined(SOC_SERIES_STM32G0) || defined (SOC_SERIES_STM32MP1) || defined(SOC_SERIES_STM32H7) || defined (SOC_SERIES_STM32WB) || defined(SOC_SERIES_STM32U5)
-	        ADC_Enable(stm32_adc_handler);
-	#else
-	        __HAL_ADC_ENABLE(stm32_adc_handler);
-	#endif
-	    }
-	    else
-	    {
-	#if defined(SOC_SERIES_STM32L4) || defined(SOC_SERIES_STM32G0) || defined (SOC_SERIES_STM32MP1) || defined(SOC_SERIES_STM32H7) || defined (SOC_SERIES_STM32WB)|| defined(SOC_SERIES_STM32U5)
-	        ADC_Disable(stm32_adc_handler);
-	#else
-	        __HAL_ADC_DISABLE(stm32_adc_handler);
-	#endif
-
-不是有点明显啊！！ 第一步：一开始是都有这个defined(SOC_SERIES_STM32U5)，然后我就想着应该是少了这个吧！！第二步：然后这个代码他报错！__HAL_ADC_ENABLE(stm32_adc_handler);，那我就想着用上面一个呗！！然后就好了！应该对吧！！
-
-
-####STM32U575系列移植SPI，测试使用007
-bug是别人帮忙改的，学着加强改bug能力！！
-
-	#if defined(SOC_SERIES_STM32F2) || defined(SOC_SERIES_STM32F4) || defined(SOC_SERIES_STM32F7)
-	            spi_bus_obj[i].dma.handle_rx.Init.Channel = spi_config[i].dma_rx->channel;
-	#elif defined(SOC_SERIES_STM32L4) || defined(SOC_SERIES_STM32G0) || defined(SOC_SERIES_STM32MP1) || defined(SOC_SERIES_STM32WB) || defined(SOC_SERIES_STM32H7)
-	            spi_bus_obj[i].dma.handle_rx.Init.Request = spi_config[i].dma_rx->request;
-	#endif
-						#if 0
-	            spi_bus_obj[i].dma.handle_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-	            spi_bus_obj[i].dma.handle_rx.Init.PeriphInc           = DMA_PINC_DISABLE;//这一部分代码报错，原因没有定义
-	            spi_bus_obj[i].dma.handle_rx.Init.MemInc              = DMA_MINC_ENABLE;
-	            spi_bus_obj[i].dma.handle_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-	            spi_bus_obj[i].dma.handle_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	            spi_bus_obj[i].dma.handle_rx.Init.Mode                = DMA_NORMAL;
-	            spi_bus_obj[i].dma.handle_rx.Init.Priority            = DMA_PRIORITY_HIGH
-						#endif
-
-别人帮我改好了，才发觉。现在看来，好像一开始的思路有点问题！！代码报错的部分，原因没有定义！我的思路是应该和上面修改PWM和ADC一样，在适当的地方加一个defined(SOC_SERIES_STM32U5)，但是你仔细看这里的报错和defined(SOC_SERIES_STM32U5)if的宏定义没有关系的，#endif已经结束了！！
-那现在最简单的改法，这是DMA现在用不到，那就屏蔽掉！！
-
-	ArmClang: error: no such file or directory: '../libraries/STM32U5xx_HAL/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_qspi.c'
-没有添加这个qspi，但是现在不需要这个，就去屏蔽掉，去哪找，去哪屏蔽！！关键点
-用VScode查找stm32u5xx_hal_qspi这个在哪！然后你要确定是哪个文件的包含stm32u5xx_hal_qspi才把这个加入到工程里面的，但是这里面并没有这个文件而报错！
-![](/figture/tu9.jpg)
-这个文件在Sconcript脚本文件！！
-
-	warning: redefinition of typedef 'socklen_t' is a C11 feature [-Wtypedef-redefinition]
-	警告：typedef 'socklen_t' 的重定义是 C11 功能[-Wtypedef-redefinition]
-
-####查找快捷键ctrl+f
-####多任务切换 win+tab
-
-####5.0版本RW007软件包移植
-
-遇到了之前的一个问题！！
-
-	.\build\keil\Obj\rtthread.axf: Error: L6218E: Undefined symbol Error_Handler (referred from stm32u5xx_hal_msp.o).
-	[stm32] 解决Error_Handler()函数在*_msp.c文件下报错的问题
-	在用户头文件区增加#include <drv_common.h>即可
-	Error_Handler在drv_common.h文件里，所以加这个头文件！！
-	
-	我的也是Undefined symbol rt_hw_spi_device_attach，我就找在那个文件里面，#include <drv_spi.h>这里，但是已经加过了！！又
-	是啥原因呢！！然后我发现drv_spi.c里面的rt_hw_spi_device_attach是灰色的！就是没使用的意思！！我才意识到是宏定义没定义，没使
-	用这个rt_hw_spi_device_attach，然后意识到没初始化这个SPI1，menuconfig里面没有配置！！
-
-##STM32U5系列BSP移植总结（重点重点超重点！！！）
-
-具体说一下，我这两周通过BSP添加了STM32U575板子的外设！u575是新板子么，RT-Thread的BSP库里面之前也没人使用过，所以需要人移植，添加一些驱动，供人使用。  
-好！那么没有人用过，添加BSP时，就不可能添加的移植代码百分百的适配这个板子！这一点能理解吧！！所以，遇到什么问题，就要去解决它，使它适配u575的开发板。  
-上面也说了一些添加按键软件包、串口2、ADC1、PWM、IIC、SPI等外设时，所遇到的问题，及其简单的处理bug,但上面的bug虽然在这个问题下解决了，但是却影响了整个RT-Thread代码里面BSP/stm32里面的代码中其他工程！！！如果是这样解决的问题，肯定是不能这样处理的，打个比方来说：
-STM32U575系列移植SPI，测试使用007
-
-	#if defined(SOC_SERIES_STM32F2) || defined(SOC_SERIES_STM32F4) || defined(SOC_SERIES_STM32F7)
-	            spi_bus_obj[i].dma.handle_rx.Init.Channel = spi_config[i].dma_rx->channel;
-	#elif defined(SOC_SERIES_STM32L4) || defined(SOC_SERIES_STM32G0) || defined(SOC_SERIES_STM32MP1) || defined(SOC_SERIES_STM32WB) || defined(SOC_SERIES_STM32H7)
-	            spi_bus_obj[i].dma.handle_rx.Init.Request = spi_config[i].dma_rx->request;
-	#endif
-						#if 0
-	            spi_bus_obj[i].dma.handle_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-	            spi_bus_obj[i].dma.handle_rx.Init.PeriphInc           = DMA_PINC_DISABLE;//这一部分代码报错，原因没有定
-						#endif
-那现在最简单的改法，这是DMA现在用不到，那就屏蔽掉！！那这样处理确实不报错了！但是这个drv_spi.c文件并不是stm32u575的专有文件，这边直接屏蔽了，那么其他文件想要使用就使用不了了！！这一点需要了解！如何解决是重点！！一开始，听别人的，这是一些DMA有关的文件，找一个宏定义一下就行，我找的是有关DMA的，如果打开了，还是不对！！那就是最大的宏，应该使用了U５７５就会报错，那么，就是如果没有定义它，就把它（这部分代码）打开，如果定义了就屏蔽掉，这样处理就不会影响到其他代码了！！是不是很神奇！！以后修改代码就是这个思路！！　　
-
-	#ifndef SOC_SERIES_STM32U5
-	            spi_bus_obj[i].dma.handle_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-	            spi_bus_obj[i].dma.handle_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
-	            spi_bus_obj[i].dma.handle_rx.Init.MemInc              = DMA_MINC_ENABLE;
-	#endif
-
-###所以下面是STM32U5系列BSP移植时，遇到的全部报错情况及大佬的修改
-
-###1.使用ADC时出现的报错情况分析
-最起码的知道是什么错误，而不是一味的去屏蔽这个地方的错误，这样即使把错误解决了，代码也可能功能上出错了！！  
-####错误一：  
-
-	#define ADC1_CONFIG                                                 \
-	    {                                                               \
-	       .Instance                   = ADC1,                          \
-	       .Init.ClockPrescaler        = ADC_CLOCK_SYNC_PCLK_DIV4,      \把这个换成下面的代码，因为u5里面没有这个宏定义
-	       .Init.ClockPrescaler        = ADC_CLOCK_ASYNC_DIV4,          \
-	       .Init.Resolution            = ADC_RESOLUTION_12B,            \
-	       .Init.DataAlign             = ADC_DATAALIGN_RIGHT,           \
-	       .Init.ScanConvMode          = ADC_SCAN_DISABLE, 
-
-（1）ADC1_CONFIG一开始是这个报错，原因是`.Init.ClockPrescaler        = ADC_CLOCK_SYNC_PCLK_DIV4,`这一行的代码没有定义！！一开始的想法是直接把这一行的代码删掉，但是总觉得不妥！！咋可能无缘无故的去删除源库里面的代码，不妥不妥！！  
-（2）但是，这个问题去交给我解决的话，我估计是搞个好几周都不一定解决的了的！所以看大佬改BUG真的可以学到东西的，因为这行代码没有定义，先看这行代码是什么，为什么找不到定义，这是一个ADC四分频的宏定义！难道是说这个stm32u575的ADC不用分频的？这是最开始的猜测。所以，把这行代码删掉就合理！！但是，可能性不大，这个单片机不太可能没有ADC分频的。  
-（3）现在是大佬的表演时间！现在就去VScode里面去找一些`ADC_CLOCK_SYNC_PCLK_DIV4`这个相似的定义，看看这个单片机是不是真的没有ADC分频的相关定义，所以，找`_PCLK_DIV4`一半，找相似的定义，这个凭运气嘛，因为库没人能看完，看完也记不住这些的，就是去搜索，去看看相似的定义，从而找到解决问题的方法！！从上帝视角看，这个搜索，也没有什么发现，大佬有搜索这个`SYNC`，我的话，肯定想不到这个，都不知道这个的含义，就发现了这个宏`ADC_CLOCK_ASYNC_DIV4`，那找到它的时候大佬就已经明白了，对比源代码的宏，多一个A，基本功：异步，异的意思，就能想到这个stm32u575单片机没有同步分频的功能，没有这个宏定义么，所以只有异步的功能，把它修改成这个宏就行！！  
-（4）我一开始还担心，如果把这个代码修改了，会不会和上面的问题一样，会影响到其他文件啊，大佬看了一下文件所在的具体位置，是u5专用的！！不会影响的。问题解决  
-
-####错误二：
- 	vref_mv = __LL_ADC_CALC_VREFANALOG_VOLTAGE(vref_value, stm32_adc_handler->Init.Resolution);
-报错！！一开始我的解决问题是屏蔽了就好了！！不能这么修改代码，简单的屏蔽了，ADC的功能就可能实现不了了，怪不得我的验证ADC测量电压一直为零！！不就能说明问题。  
-我想，我稍微的去看一下这个代码的函数定义就能发现它错在哪了！！能本就不用去看报错原因！！可是我没有看！可能是个态度问题吧，这个需要改！！是函数参数不对！！
-（1）大佬的解决问题，这个我肯定一下子学不来！看函数定义缺少哪个或者那几个参数，添加进来就行，我现在的功力达不到
-
-	#ifdef SOC_SERIES_STM32U5
-	    vref_mv = __LL_ADC_CALC_VREFANALOG_VOLTAGE(stm32_adc_handler->Instance, vref_value, stm32_adc_handler->Init.Resolution);
-	#else
-	    vref_mv = __LL_ADC_CALC_VREFANALOG_VOLTAGE(vref_value, stm32_adc_handler->Init.Resolution);
-	#endif
-
-这里就有一个非常大非常大的坑！！我感觉一般人搞不定的，源代码现在没打开，条件不允许啊！不知道为啥，这个文件并不是像上面的文件一样，只是u5专用，这个文件时drv_adc.c文件，是所有stm32芯片公用的！这里如果直接把`vref_mv = __LL_ADC_CALC_VREFANALOG_VOLTAGE(vref_value, stm32_adc_handler->Init.Resolution);`修改成`vref_mv = __LL_ADC_CALC_VREFANALOG_VOLTAGE(stm32_adc_handler->Instance, vref_value, stm32_adc_handler->Init.Resolution);`会不会影响其他文件，难道还是说这个代码是源代码里面的BUG，代码更新，u5里面的代码没有及时更新，导致参数输入错误，很有可能！！  
-（2）资深大佬可不是仅靠猜测来修改代码的，他去看看别的stm32其他系列单片机里面的这个函数是否也是两个参数，查了一下，是，那就把U5单独提出来做修改，修改如上，经典思路，谨记谨记  
-（3）我觉得其他stm32文件的`__LL_ADC_CALC_VREFANALOG_VOLTAGE(stm32_adc_handler->Instance, vref_value, stm32_adc_handler->Init.Resolution);`这个函数，会不会也是没更新，使用时也会报错，这个因为没使用，现在条件不允许，会验证！！这个以后再说  
-
-###2使用SPI1驱动flash中遇到的错误
-
-####错误一：
-	#ifndef SOC_SERIES_STM32U5
-	            spi_bus_obj[i].dma.handle_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-	            spi_bus_obj[i].dma.handle_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
-	            spi_bus_obj[i].dma.handle_tx.Init.MemInc              = DMA_MINC_ENABLE;
-	            spi_bus_obj[i].dma.handle_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-	            spi_bus_obj[i].dma.handle_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	            spi_bus_obj[i].dma.handle_tx.Init.Mode                = DMA_NORMAL;
-	            spi_bus_obj[i].dma.handle_tx.Init.Priority            = DMA_PRIORITY_LOW;
-	#endif
-（1）有两处dma的地方，没有定义报错，我上面的修改，是最简单的一种，但是，我现在忽然想到，这里的该法是因为我并没有使用DMA，这里DMA报错，那我直接屏蔽掉就行，如果使用u5就把它屏蔽，如果没有定义u5就可以使用，可取。
-（2）但是现在，那如果我要在U5里面使用DMA呢，把屏蔽了，算咋回事，这出的修改BUG有待改良！！
-有时间可以自己去解决！！和`.Init.ClockPrescaler        = ADC_CLOCK_ASYNC_DIV4`解决方法一样！！
-
-###错误二：
-	src += ['STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_qspi.c']没有找到这个qspi文件！
-（1）这个BUG另一个大佬帮解决的！！它是如何找到，并屏蔽它的，前面说的有，也是使用VScode在整个文件里面去找的，然后靠自己的积累，能力的体现的，去找到报错产生的可能的位置，并把它屏蔽！！必须有点技术啊，这个文件是scons编译加载进来的，然后没有这个文件报错，这也是u5的专属文件，可以修改！！  
-（2）上面的是初级版的BUG修改，还可以优化！看大佬的修改，他发现确实没有这个文件，但是有ospi.c文件，就猜测写源代码的人，出现写了这个BUG，就把修改了：
-
-    src += ['STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_qspi.c']
-    src += ['STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_ospi.c']
-
-###3其他添加外设并无报错问题！！
-
